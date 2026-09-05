@@ -29,6 +29,19 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   const pin = process.env.EOFFICE_KAPRODI_PIN || '1234';
   await page.fill('input[name="pin"]', pin);
   await page.click('button[type="submit"]');
-  // Wait for success page after signing (increase timeout to allow PDF/hash/signing)
-  await page.waitForURL('**/?url=kaprodi/sukses/*', { timeout: 30000 });
+  // Wait for either success or review redirect (allow longer timeout)
+  await page.waitForTimeout(2000);
+  // Give server up to 45s for processing then check resulting URL
+  await page.waitForTimeout(43000);
+  const finalUrl = page.url();
+  if (finalUrl.includes('?url=kaprodi/sukses/')) {
+    // success
+    return;
+  }
+  if (finalUrl.includes('?url=kaprodi/review/')) {
+    // Attempt to surface error message from page
+    const err = await page.locator('.alert.error').innerText().catch(() => 'Unknown error - no .alert.error');
+    throw new Error('Signing failed, redirected to review: ' + err + ' | URL=' + finalUrl);
+  }
+  throw new Error('Signing did not complete; final URL=' + finalUrl);
 });
