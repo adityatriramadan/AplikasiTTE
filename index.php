@@ -193,8 +193,10 @@ elseif ($seg0 === '__test_login') {
         $user = $userModel->getByNip($nip);
         if ($user) {
             Auth::login($user);
+            // Prefer EOFFICE_BASE_URL when running in test mode (CI / built-in server)
+            $redirectBase = getenv('EOFFICE_BASE_URL') ?: BASE_URL;
             // Redirect using query-style router used by this front controller
-            header('Location: ' . BASE_URL . '/?url=' . $user['role'] . '/dashboard');
+            header('Location: ' . rtrim($redirectBase, '/') . '/?url=' . $user['role'] . '/dashboard');
             exit;
         }
     }
