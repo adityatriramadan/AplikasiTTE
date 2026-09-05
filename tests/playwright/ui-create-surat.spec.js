@@ -12,9 +12,13 @@ test('Sekretaris can create surat (skeleton)', async ({ page }) => {
   // 4) Navigate to buat surat (use query-route for PHP built-in server)
   await page.goto(`${base}/?url=sekretaris/buat-surat`);
 
-  // 5) This is a skeleton: choose first template and proceed (selector may need adjustment)
-  await page.click('a.template-card, .template-item');
-  await page.click('a[href*="?url=sekretaris/isi-form"]');
+  // 5) Choose first template: read its href and navigate using query-route
+  const tplHref = await page.getAttribute('div.grid.cols-3 a', 'href');
+  if (!tplHref) throw new Error('No template links found on Buat Surat page');
+  const tplMatch = tplHref.match(/isi-form\/(\d+)/);
+  if (!tplMatch) throw new Error('Cannot extract template ID from href: ' + tplHref);
+  const tplId = tplMatch[1];
+  await page.goto(`${base}/?url=sekretaris/isi-form/${tplId}`);
 
   // 6) Fill minimal fields
   await page.fill('input[name="perihal"]', 'Automated test surat');
