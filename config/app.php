@@ -1,5 +1,11 @@
 <?php
-define('BASE_URL', 'http://localhost/eoffice');
+// Allow overriding BASE_URL for local testing (set EOFFICE_BASE_URL env var)
+$baseUrlEnv = getenv('EOFFICE_BASE_URL');
+if ($baseUrlEnv !== false && !empty($baseUrlEnv)) {
+	define('BASE_URL', $baseUrlEnv);
+} else {
+	define('BASE_URL', 'http://localhost/eoffice');
+}
 define('BASE_PATH', dirname(__DIR__));
 define('STORAGE_KEYS', BASE_PATH . '/storage/keys/');
 define('STORAGE_PDF',  BASE_PATH . '/public/pdf/');
