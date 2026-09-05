@@ -5,7 +5,7 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
 
   // Quick-test login via test helper route
   await page.goto(`${base}/?url=__test_login&nip=${process.env.EOFFICE_KAPRODI_USER || 'kaprodi001'}`);
-  await page.waitForURL('**/kaprodi/*');
+  await page.waitForURL('**/?url=kaprodi/*');
 
   // Go to antrian and open first review
   await page.goto(`${base}/kaprodi/antrian`);

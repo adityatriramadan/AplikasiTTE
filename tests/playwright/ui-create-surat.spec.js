@@ -6,8 +6,8 @@ test('Sekretaris can create surat (skeleton)', async ({ page }) => {
 
   // Quick-test login via test helper route (only enabled when EOFFICE_ENABLE_TEST_ROUTES=1)
   await page.goto(`${base}/?url=__test_login&nip=${process.env.EOFFICE_TEST_USER || 'sekretaris001'}`);
-  // Wait for redirect to sekretaris dashboard
-  await page.waitForURL('**/sekretaris/*');
+  // Wait for redirect to sekretaris dashboard (front controller uses query param)
+  await page.waitForURL('**/?url=sekretaris/*');
 
   // 4) Navigate to buat surat
   await page.goto(`${base}/sekretaris/buat-surat`);
