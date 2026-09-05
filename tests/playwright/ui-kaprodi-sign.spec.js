@@ -16,8 +16,13 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   const revId = revMatch[1];
   await page.goto(`${base}/?url=kaprodi/review/${revId}`);
 
-  // Click tombol tanda tangan / input pin
-  await page.click('a[href*="?url=kaprodi/input-pin/"]');
+  // Click tombol tanda tangan / input pin: extract href and navigate via query-route
+  const pinHref = await page.getAttribute('a.btn.ok', 'href');
+  if (!pinHref) throw new Error('Input PIN link not found on review page');
+  const pinMatch = pinHref.match(/input-pin\/(\d+)/);
+  if (!pinMatch) throw new Error('Cannot extract input-pin ID from href: ' + pinHref);
+  const pinId = pinMatch[1];
+  await page.goto(`${base}/?url=kaprodi/input-pin/${pinId}`);
 
   // Fill PIN (test account must have known PIN)
   await page.fill('input[name="pin"]', process.env.EOFFICE_KAPRODI_PIN || '1234');

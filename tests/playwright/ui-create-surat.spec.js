@@ -24,7 +24,13 @@ test('Sekretaris can create surat (skeleton)', async ({ page }) => {
   await page.fill('input[name="perihal"]', 'Automated test surat');
   await page.fill('input[name="tanggal_surat"]', new Date().toISOString().slice(0,10));
 
-  // 7) Preview (submit form)
+  // 7) Force form to submit via query-route (built-in PHP server) then submit
+  await page.evaluate(() => {
+    const f = document.getElementById('form-surat');
+    if (f) {
+      f.action = window.location.origin + '/?url=sekretaris/preview-surat';
+    }
+  });
   await page.click('button[type="submit"]');
 
   // 8) Expect preview page to show perihal
