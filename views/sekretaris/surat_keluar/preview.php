@@ -1,5 +1,21 @@
-<?php $preview = $data['preview'] ?? []; $fieldDinamis = $data['field_dinamis'] ?? []; ?>
+<?php
+$preview = $data['preview'] ?? [];
+$fieldDinamis = $data['field_dinamis'] ?? [];
+$flashError = $_SESSION['error'] ?? null;
+$flashSuccess = $_SESSION['success'] ?? null;
+unset($_SESSION['error'], $_SESSION['success']);
+?>
 <div class="card">
+    <?php if (!empty($flashError)): ?>
+    <div style="background:#fff1f0;border:1px solid #fecaca;padding:12px;border-radius:8px;margin-bottom:12px;color:#991b1b;">
+        <strong>Terjadi kesalahan:</strong>
+        <div style="margin-top:6px;"><?= htmlspecialchars($flashError, ENT_QUOTES, 'UTF-8') ?></div>
+    </div>
+    <?php elseif (!empty($flashSuccess)): ?>
+    <div style="background:#ecfdf5;border:1px solid #bbf7d0;padding:12px;border-radius:8px;margin-bottom:12px;color:#065f46;">
+        <?= htmlspecialchars($flashSuccess, ENT_QUOTES, 'UTF-8') ?>
+    </div>
+    <?php endif; ?>
     <h2>Preview Surat</h2>
     <p class="muted">Periksa isi surat sebelum disimpan sebagai draft.</p>
 </div>
