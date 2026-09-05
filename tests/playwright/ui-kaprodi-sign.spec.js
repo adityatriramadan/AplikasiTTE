@@ -3,13 +3,8 @@ const { test, expect } = require('@playwright/test');
 test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   const base = process.env.EOFFICE_BASE_URL || 'http://127.0.0.1:8080';
 
-  // Login as kaprodi
-  await page.goto(`${base}/auth/login`);
-  await page.fill('input[name="username"]', process.env.EOFFICE_KAPRODI_USER || 'kaprodi@example.com');
-  await page.fill('input[name="password"]', process.env.EOFFICE_KAPRODI_PASS || 'secret');
-  await page.click('button[type="submit"]');
-
-  // Wait for kaprodi dashboard
+  // Quick-test login via test helper route
+  await page.goto(`${base}/?url=__test_login&nip=${process.env.EOFFICE_KAPRODI_USER || 'kaprodi001'}`);
   await page.waitForURL('**/kaprodi/*');
 
   // Go to antrian and open first review

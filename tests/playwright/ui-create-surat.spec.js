@@ -2,17 +2,11 @@ const { test, expect } = require('@playwright/test');
 
 test('Sekretaris can create surat (skeleton)', async ({ page }) => {
   // Configure BASE_URL in env when running locally, e.g. export EOFFICE_BASE_URL=http://localhost/eoffice
-  const base = process.env.EOFFICE_BASE_URL || 'http://localhost/eoffice';
+  const base = process.env.EOFFICE_BASE_URL || 'http://127.0.0.1:8080';
 
-  // 1) Visit login page
-  await page.goto(`${base}/auth/login`);
-
-  // 2) Fill credentials (update selectors if different)
-  await page.fill('input[name="username"]', process.env.EOFFICE_TEST_USER || 'sekretaris@example.com');
-  await page.fill('input[name="password"]', process.env.EOFFICE_TEST_PASS || 'secret');
-  await page.click('button[type="submit"]');
-
-  // 3) Wait for dashboard
+  // Quick-test login via test helper route (only enabled when EOFFICE_ENABLE_TEST_ROUTES=1)
+  await page.goto(`${base}/?url=__test_login&nip=${process.env.EOFFICE_TEST_USER || 'sekretaris001'}`);
+  // Wait for redirect to sekretaris dashboard
   await page.waitForURL('**/sekretaris/*');
 
   // 4) Navigate to buat surat
