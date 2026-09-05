@@ -187,7 +187,8 @@ elseif ($seg0 === '__test_login') {
         $user = $userModel->getByNip($nip);
         if ($user) {
             Auth::login($user);
-            header('Location: ' . BASE_URL . '/' . $user['role'] . '/dashboard');
+            // Redirect using query-style router used by this front controller
+            header('Location: ' . BASE_URL . '/?url=' . $user['role'] . '/dashboard');
             exit;
         }
     }
