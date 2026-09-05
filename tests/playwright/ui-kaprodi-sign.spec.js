@@ -24,6 +24,11 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   const pinId = pinMatch[1];
   await page.goto(`${base}/?url=kaprodi/input-pin/${pinId}`);
 
-  // Verify input-pin page displayed (do not proceed with real signing in UI test)
+  // Verify input-pin page displayed and perform signing (use test PIN)
   await expect(page.locator('input[name="pin"]')).toBeVisible({ timeout: 5000 });
+  const pin = process.env.EOFFICE_KAPRODI_PIN || '1234';
+  await page.fill('input[name="pin"]', pin);
+  await page.click('button[type="submit"]');
+  // Wait for success page after signing
+  await page.waitForURL('**/?url=kaprodi/sukses/*', { timeout: 10000 });
 });
