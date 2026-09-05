@@ -58,3 +58,58 @@ jobs:
           EOFFICE_DB_USER: root
           EOFFICE_DB_PASS: root
         run: php tools/e2e_test.php || true
+
+    playwright-ui:
+      needs: php-checks
+      runs-on: ubuntu-latest
+      services:
+        mysql:
+          image: mysql:5.7
+          env:
+            MYSQL_ROOT_PASSWORD: root
+          ports:
+            - 3306:3306
+          options: >-
+            --health-cmd="mysqladmin ping --silent"
+            --health-interval=5s
+            --health-timeout=5s
+            --health-retries=5
+
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Setup PHP
+          uses: shivammathur/setup-php@v3
+          with:
+            php-version: '8.1'
+            extensions: mbstring,openssl,pdo_mysql
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '18'
+
+        - name: Install Node deps
+          working-directory: tests/playwright
+          run: |
+            npm ci || npm install
+
+        - name: Install Playwright browsers
+          working-directory: tests/playwright
+          run: npx playwright install --with-deps
+
+        - name: Start PHP built-in server
+          env:
+            EOFFICE_DB_HOST: 127.0.0.1
+            EOFFICE_DB_NAME: eoffice_test
+            EOFFICE_DB_USER: root
+            EOFFICE_DB_PASS: root
+          run: |
+            php -S 0.0.0.0:8080 index.php > /tmp/php-server.log 2>&1 &
+            for i in {1..20}; do curl -sSf http://127.0.0.1:8080 || sleep 1 && break; done
+
+        - name: Run Playwright tests
+          working-directory: tests/playwright
+          env:
+            EOFFICE_BASE_URL: http://127.0.0.1:8080
+          run: npm test
