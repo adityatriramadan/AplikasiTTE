@@ -78,7 +78,13 @@ class Auth {
             'sekretaris' => BASE_URL . '/sekretaris/dashboard',
             'dosen'      => BASE_URL . '/dosen/dashboard',
         ];
-        $url = $map[$role] ?? BASE_URL . '/login';
+        // If BASE_URL was overridden for local testing (query-style router), prefer query-route redirects
+        $baseEnv = getenv('EOFFICE_BASE_URL');
+        if ($baseEnv !== false && !empty($baseEnv)) {
+            $url = $baseEnv . '/?url=' . ($role ?: 'login') . '/dashboard';
+        } else {
+            $url = $map[$role] ?? BASE_URL . '/login';
+        }
         header('Location: ' . $url);
         exit;
     }
