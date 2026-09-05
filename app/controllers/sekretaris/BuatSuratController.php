@@ -104,10 +104,24 @@ class BuatSuratController {
         $fieldDinamis = json_decode($template['field_dinamis'], true) ?? [];
         $isiData = [];
         $fieldIndex = 0;
+        $errors = [];
         foreach ($fieldDinamis as $field) {
             $normalizedField = $this->normalizeField((array)$field, $fieldIndex++);
             $key = $normalizedField['name'];
-            $isiData[$key] = Security::sanitize($_POST[$key] ?? '');
+            $val = Security::sanitize($_POST[$key] ?? '');
+            // validate required
+            if ($normalizedField['required'] && trim($val) === '') {
+                $errors[] = 'Field "' . $normalizedField['label'] . '" harus diisi.';
+            }
+            $isiData[$key] = $val;
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['error'] = implode(' ', $errors);
+            // preserve input
+            $_SESSION['old_input'] = $_POST;
+            header('Location: ' . BASE_URL . '/sekretaris/isi-form/' . $templateId);
+            exit;
         }
 
         $previewData = [
@@ -164,10 +178,27 @@ class BuatSuratController {
         $fieldDinamis = json_decode($template['field_dinamis'], true) ?? [];
         $isiData = [];
         $fieldIndex = 0;
+        $errors = [];
         foreach ($fieldDinamis as $field) {
             $normalizedField = $this->normalizeField((array)$field, $fieldIndex++);
             $key = $normalizedField['name'];
-            $isiData[$key] = Security::sanitize($_POST[$key] ?? '');
+            $val = Security::sanitize($_POST[$key] ?? '');
+            if ($normalizedField['required'] && trim($val) === '') {
+                $errors[] = 'Field "' . $normalizedField['label'] . '" harus diisi.';
+            }
+            $isiData[$key] = $val;
+        }
+
+        // validate tanggal format
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
+            $errors[] = 'Format tanggal surat tidak valid. Gunakan YYYY-MM-DD.';
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['error'] = implode(' ', $errors);
+            $_SESSION['old_input'] = $_POST;
+            header('Location: ' . BASE_URL . '/sekretaris/isi-form/' . $templateId);
+            exit;
         }
 
         // Generate nomor surat otomatis
