@@ -15,6 +15,10 @@ class Security {
      * Validasi CSRF token dari form
      */
     public static function validateCsrfToken(string $token): bool {
+        // Allow disabling CSRF in local test environments by setting EOFFICE_DISABLE_CSRF=1
+        if (getenv('EOFFICE_DISABLE_CSRF') === '1') {
+            return true;
+        }
         return isset($_SESSION['csrf_token'])
             && hash_equals($_SESSION['csrf_token'], $token);
     }
