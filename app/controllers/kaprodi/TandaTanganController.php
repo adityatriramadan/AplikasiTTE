@@ -217,7 +217,13 @@ class TandaTanganController {
             $logModel->catat($kaprodiId, 'tanda_tangan', 'Menandatangani surat ID: ' . $suratId . ' — ' . $surat['nomor_surat']);
 
             $_SESSION['success'] = 'Surat berhasil ditandatangani secara digital!';
-            header('Location: ' . BASE_URL . '/kaprodi/sukses/' . $suratId);
+            // Prefer query-style redirect when running with EOFFICE_BASE_URL (built-in server testing)
+            $baseEnv = getenv('EOFFICE_BASE_URL');
+            if ($baseEnv !== false && !empty($baseEnv)) {
+                header('Location: ' . $baseEnv . '/?url=kaprodi/sukses/' . $suratId);
+            } else {
+                header('Location: ' . BASE_URL . '/kaprodi/sukses/' . $suratId);
+            }
             exit;
 
         } catch (Exception $e) {
