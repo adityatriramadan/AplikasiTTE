@@ -108,15 +108,6 @@ $cntTotal      = array_sum($countStatus);
                     <div><div style="font-weight:600;font-size:14px;">Buat Surat Baru</div><div style="font-size:12px;color:var(--muted);">Pilih template dan isi data surat</div></div>
                     <span style="margin-left:auto;color:var(--muted);">→</span>
                 </a>
-                <a href="<?= BASE_URL ?>/sekretaris/surat-masuk" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;color:var(--text);background:#f9fafb;text-decoration:none;">
-                    <span style="font-size:22px;">📥</span>
-                    <div><div style="font-weight:600;font-size:14px;">Surat Masuk</div><div style="font-size:12px;color:var(--muted);">Input dan disposisi surat masuk</div></div>
-                    <span style="margin-left:auto;color:var(--muted);">→</span>
-                </a>
-                <a href="<?= BASE_URL ?>/sekretaris/arsip" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;color:var(--text);background:#f9fafb;text-decoration:none;">
-                    <span style="font-size:22px;">🗄️</span>
-                    <div><div style="font-weight:600;font-size:14px;">Arsip Surat</div><div style="font-size:12px;color:var(--muted);">Cari surat di arsip</div></div>
-                    <span style="margin-left:auto;color:var(--muted);">→</span>
                 </a>
             </div>
         </div>

@@ -24,15 +24,6 @@ $totalSurat = array_sum($jumlahSurat);
         </div>
     </div>
 </div>
-
-<?php if (!extension_loaded('gd')): ?>
-<div style="margin-bottom:18px;">
-    <div style="background:#fff7ed;border:1px solid #fed7aa;padding:12px;border-radius:8px;color:#92400e;">
-        <strong>Perhatian:</strong> Ekstensi PHP <em>GD</em> tidak aktif. Beberapa fitur (mis. konversi/penyimpanan QR sebagai PNG) mungkin tidak tersedia. Aktifkan ekstensi GD di php.ini lalu restart Apache.
-    </div>
-</div>
-<?php endif; ?>
-
 <!-- Stats User -->
 <div style="margin-bottom:12px;"><span style="font-size:13px;font-weight:600;color:var(--muted);">📊 STATISTIK USER</span></div>
 <div class="grid cols-4" style="margin-bottom:20px;">

@@ -32,3 +32,10 @@
 </aside>
 <main class="content">
     <div class="container">
+        <?php if (!extension_loaded('gd')): ?>
+        <div style="margin-bottom:18px;">
+            <div style="background:#fff7ed;border:1px solid #fed7aa;padding:12px;border-radius:8px;color:#92400e;">
+                <strong>Perhatian:</strong> Ekstensi PHP <em>GD</em> tidak aktif. Beberapa fitur (mis. konversi/penyimpanan QR sebagai PNG) mungkin tidak tersedia. Aktifkan ekstensi GD di php.ini lalu restart Apache.
+            </div>
+        </div>
+        <?php endif; ?>
