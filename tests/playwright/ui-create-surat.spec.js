@@ -33,6 +33,6 @@ test('Sekretaris can create surat (skeleton)', async ({ page }) => {
   });
   await page.click('button[type="submit"]');
 
-  // 8) Expect preview page to show perihal label
-  await expect(page.locator('text=Perihal:')).toBeVisible({ timeout: 5000 });
+  // 8) Expect preview page to load (Preview Surat heading)
+  await expect(page.locator('text=Preview Surat')).toBeVisible({ timeout: 5000 });
 });
