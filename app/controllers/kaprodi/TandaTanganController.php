@@ -228,6 +228,10 @@ class TandaTanganController {
 
         } catch (Exception $e) {
             error_log('[TandaTangan Error] ' . $e->getMessage());
+                // Also write detailed error to storage logs for test debugging
+                $logDir = BASE_PATH . '/storage/logs';
+                if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
+                @file_put_contents($logDir . '/tanda_tangan_error.log', date('c') . ' - ' . $e->getMessage() . "\n", FILE_APPEND | LOCK_EX);
             $_SESSION['error'] = $e->getMessage();
             header('Location: ' . BASE_URL . '/kaprodi/review/' . $suratId);
             exit;
