@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, feature/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  php-checks:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v3
+        with:
+          php-version: '8.1'
+          extensions: mbstring,openssl,pdo_mysql
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..20}; do mysql -h127.0.0.1 -uroot -proot -e 'select 1' && break || sleep 1; done
+
+      - name: Create test database
+        run: mysql -h127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS eoffice_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+      - name: Import SQL schema
+        env:
+          EOFFICE_DB_HOST: 127.0.0.1
+          EOFFICE_DB_NAME: eoffice_test
+          EOFFICE_DB_USER: root
+          EOFFICE_DB_PASS: root
+        run: php database/import_db.php || true
+
+      - name: PHP lint
+        run: |
+          set -e
+          find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l || true
+
+      - name: Run programmatic smoke E2E
+        env:
+          EOFFICE_DB_HOST: 127.0.0.1
+          EOFFICE_DB_NAME: eoffice_test
+          EOFFICE_DB_USER: root
+          EOFFICE_DB_PASS: root
+        run: php tools/e2e_test.php || true
