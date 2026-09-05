@@ -1,5 +1,9 @@
 <?php
+// Include TCPDF 2D barcode library while suppressing deprecated notices from older TCPDF versions
+$oldErr = error_reporting();
+error_reporting($oldErr & ~E_DEPRECATED);
 require_once BASE_PATH . '/vendor/tcpdf/TCPDF-6.7.7/tcpdf_barcodes_2d.php';
+error_reporting($oldErr);
 
 class QrHelper {
 
