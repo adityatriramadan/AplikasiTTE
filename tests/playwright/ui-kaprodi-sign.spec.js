@@ -30,6 +30,11 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   await expect(page.locator('input[name="pin"]')).toBeVisible({ timeout: 5000 });
   const pin = process.env.EOFFICE_KAPRODI_PIN || '1234';
   await page.fill('input[name="pin"]', pin);
+  // Ensure form posts via query-route so PHP built-in server routes through index.php
+  await page.evaluate(() => {
+    const f = document.querySelector('form[method="post"][action*="tanda-tangan"]');
+    if (f) f.action = window.location.origin + '/?url=kaprodi/tanda-tangan';
+  });
   // Accept the confirmation dialog triggered by onsubmit
   page.once('dialog', dialog => dialog.accept());
   await page.click('button[type="submit"]');
