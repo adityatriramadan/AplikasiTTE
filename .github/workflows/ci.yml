@@ -1,3 +1,81 @@
+name: CI - Playwright UI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  playwright-ui:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: eoffice
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, pdo_mysql, openssl
+
+      - name: Install system MySQL client
+        run: sudo apt-get update && sudo apt-get install -y default-mysql-client
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            mysql -h 127.0.0.1 -uroot -proot -e "SELECT 1" && break || sleep 1
+          done
+
+      - name: Import database schema
+        run: mysql -h 127.0.0.1 -uroot -proot eoffice < database/eoffice.sql
+
+      - name: Install Composer dependencies (if any)
+        run: composer install --no-progress --no-interaction || true
+
+      - name: Seed DB (programmatic e2e helper)
+        run: php tools/e2e_test.php || true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Playwright & deps
+        run: |
+          cd tests/playwright
+          npm ci
+          npx playwright install --with-deps
+
+      - name: Start PHP dev server
+        env:
+          EOFFICE_BASE_URL: http://127.0.0.1:8080
+          EOFFICE_DISABLE_CSRF: '1'
+        run: |
+          nohup php -S 127.0.0.1:8080 -t . > /tmp/php-server.log 2>&1 &
+          for i in {1..30}; do
+            curl -sSf http://127.0.0.1:8080/ && break || sleep 1
+          done
+
+      - name: Run Playwright tests
+        env:
+          EOFFICE_BASE_URL: http://127.0.0.1:8080
+          EOFFICE_DISABLE_CSRF: '1'
+        run: |
+          cd tests/playwright
+          npx playwright test --reporter=list
 name: CI
 
 on:
