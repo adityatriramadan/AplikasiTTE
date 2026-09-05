@@ -2,6 +2,10 @@
 $template     = $data['template']      ?? [];
 $fieldDinamis = $data['field_dinamis'] ?? [];
 $csrfToken    = $data['csrf_token']    ?? '';
+$oldInput     = $_SESSION['old_input'] ?? [];
+$errorMessage = $_SESSION['error'] ?? null;
+// clear flash
+unset($_SESSION['old_input'], $_SESSION['error']);
 $namaJenis    = htmlspecialchars($template['nama_jenis'] ?? 'Surat', ENT_QUOTES, 'UTF-8');
 $kodeJenis    = htmlspecialchars($template['kode_jenis'] ?? '-', ENT_QUOTES, 'UTF-8');
 ?>
@@ -25,25 +29,32 @@ $kodeJenis    = htmlspecialchars($template['kode_jenis'] ?? '-', ENT_QUOTES, 'UT
         <!-- KOLOM KIRI: Data Pokok Surat -->
         <div>
             <div class="card">
+                <?php if (!empty($errorMessage)): ?>
+                <div style="background:#fff1f0;border:1px solid #fecaca;padding:12px;border-radius:8px;margin-bottom:12px;color:#991b1b;">
+                    <strong>Terjadi kesalahan:</strong>
+                    <div style="margin-top:6px;"><?= htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8') ?></div>
+                </div>
+                <?php endif; ?>
                 <h3 style="margin:0 0 16px;color:var(--brand);">📋 Data Pokok Surat</h3>
 
                 <div class="field">
                     <label for="perihal">Perihal Surat <span style="color:#b42318;">*</span></label>
                     <input type="text" id="perihal" name="perihal" required
                            placeholder="Contoh: Permohonan Surat Keterangan Aktif Kuliah"
-                           maxlength="255">
+                           maxlength="255"
+                           value="<?= htmlspecialchars($oldInput['perihal'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                 </div>
                 <div class="field">
                     <label for="tanggal_surat">Tanggal Surat <span style="color:#b42318;">*</span></label>
                     <input type="date" id="tanggal_surat" name="tanggal_surat" required
-                           value="<?= htmlspecialchars($data['tanggal_hari_ini'] ?? date('Y-m-d'), ENT_QUOTES, 'UTF-8') ?>">
+                           value="<?= htmlspecialchars($oldInput['tanggal_surat'] ?? ($data['tanggal_hari_ini'] ?? date('Y-m-d')), ENT_QUOTES, 'UTF-8') ?>">
                 </div>
             </div>
 
             <?php if (!empty($fieldDinamis)): ?>
             <div class="card">
                 <h3 style="margin:0 0 16px;color:var(--brand);">📌 Data Khusus <?= $namaJenis ?></h3>
-                <?php $fieldIndex = 0; foreach ($fieldDinamis as $field):
+                  <?php $fieldIndex = 0; foreach ($fieldDinamis as $field):
                     $fieldName  = trim((string)($field['name'] ?? $field['key'] ?? ''));
                     $fnameValue = $fieldName !== '' ? $fieldName : 'field_' . (++$fieldIndex);
                     $flabelValue = trim((string)($field['label'] ?? $field['title'] ?? ''));
@@ -52,21 +63,22 @@ $kodeJenis    = htmlspecialchars($template['kode_jenis'] ?? '-', ENT_QUOTES, 'UT
                     $flabel = htmlspecialchars($flabelValue, ENT_QUOTES, 'UTF-8');
                     $ftype  = $field['type'] ?? 'text';
                     $freq   = !empty($field['required']);
+                      $existing = $oldInput[$fnameValue] ?? '';
                 ?>
                 <div class="field">
                     <label for="f_<?= $fname ?>"><?= $flabel ?><?= $freq ? ' <span style="color:#b42318;">*</span>' : '' ?></label>
                     <?php if ($ftype === 'textarea'): ?>
-                    <textarea id="f_<?= $fname ?>" name="<?= $fname ?>" rows="4"
-                              <?= $freq ? 'required' : '' ?>
-                              placeholder="<?= $flabel ?>..."></textarea>
+                      <textarea id="f_<?= $fname ?>" name="<?= $fname ?>" rows="4"
+                          <?= $freq ? 'required' : '' ?>
+                          placeholder="<?= $flabel ?>..."><?= htmlspecialchars($existing, ENT_QUOTES, 'UTF-8') ?></textarea>
                     <?php elseif ($ftype === 'date'): ?>
-                    <input type="date" id="f_<?= $fname ?>" name="<?= $fname ?>" <?= $freq ? 'required' : '' ?>>
+                      <input type="date" id="f_<?= $fname ?>" name="<?= $fname ?>" <?= $freq ? 'required' : '' ?> value="<?= htmlspecialchars($existing, ENT_QUOTES, 'UTF-8') ?>">
                     <?php elseif ($ftype === 'number'): ?>
-                    <input type="number" id="f_<?= $fname ?>" name="<?= $fname ?>" <?= $freq ? 'required' : '' ?>
-                           placeholder="<?= $flabel ?>...">
+                      <input type="number" id="f_<?= $fname ?>" name="<?= $fname ?>" <?= $freq ? 'required' : '' ?>
+                          placeholder="<?= $flabel ?>..." value="<?= htmlspecialchars($existing, ENT_QUOTES, 'UTF-8') ?>">
                     <?php else: ?>
-                    <input type="text" id="f_<?= $fname ?>" name="<?= $fname ?>" <?= $freq ? 'required' : '' ?>
-                           placeholder="<?= $flabel ?>...">
+                      <input type="text" id="f_<?= $fname ?>" name="<?= $fname ?>" <?= $freq ? 'required' : '' ?>
+                          placeholder="<?= $flabel ?>..." value="<?= htmlspecialchars($existing, ENT_QUOTES, 'UTF-8') ?>">
                     <?php endif; ?>
                 </div>
                 <?php endforeach; ?>
