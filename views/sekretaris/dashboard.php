@@ -16,6 +16,14 @@ $cntTotal      = array_sum($countStatus);
 <div style="background:linear-gradient(135deg,#1d6fd8 0%,#0f4c81 100%);border-radius:20px;padding:28px 32px;margin-bottom:20px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
     <div>
         <div style="font-size:13px;opacity:.8;margin-bottom:4px;">Selamat datang kembali 👋</div>
+    <?php if (!extension_loaded('gd')): ?>
+    <div style="margin-bottom:18px;">
+        <div style="background:#fff7ed;border:1px solid #fed7aa;padding:12px;border-radius:8px;color:#92400e;">
+            <strong>Perhatian:</strong> Ekstensi PHP <em>GD</em> tidak aktif. Beberapa fitur (mis. konversi/penyimpanan QR sebagai PNG) mungkin tidak tersedia. Aktifkan ekstensi GD di php.ini lalu restart Apache.
+        </div>
+    </div>
+    <?php endif; ?>
+
         <h2 style="margin:0 0 6px;font-size:24px;"><?= htmlspecialchars($data['current_user']['nama'] ?? 'Sekretaris', ENT_QUOTES, 'UTF-8') ?></h2>
         <div style="opacity:.85;font-size:14px;">Sekretaris — Prodi Teknik Informatika, UNPAM</div>
     </div>
