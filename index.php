@@ -177,6 +177,24 @@ if ($seg0 === '' || $seg0 === 'login') {
     $route = ['file' => __DIR__ . '/app/controllers/publik/VerifikasiPublikController.php', 'class' => 'VerifikasiPublikController', 'method' => 'index', 'param' => null];
 }
 
+// --- Test helper routes (disabled by default) ---
+elseif ($seg0 === '__test_login' && getenv('EOFFICE_ENABLE_TEST_ROUTES') === '1') {
+    // Usage: /?url=__test_login&nip=sekretaris001
+    $nip = $_GET['nip'] ?? '';
+    if (!empty($nip)) {
+        require_once __DIR__ . '/app/models/UserModel.php';
+        $userModel = new UserModel();
+        $user = $userModel->getByNip($nip);
+        if ($user) {
+            Auth::login($user);
+            header('Location: ' . BASE_URL . '/' . $user['role'] . '/dashboard');
+            exit;
+        }
+    }
+    header('Location: ' . BASE_URL . '/login');
+    exit;
+}
+
 // ============================================================
 // DISPATCH
 // ============================================================
