@@ -12,10 +12,14 @@ class PdfHelper {
      * Digunakan untuk menghitung hash SHA-256 (sebelum QR Code ditempel)
      */
     public function renderSurat(array $surat, string $outputPath): void {
+        // suppress deprecated notices from TCPDF during PDF rendering
+        $oldErr = error_reporting();
+        error_reporting($oldErr & ~E_DEPRECATED);
         $pdf = $this->createPdf($surat['perihal']);
         $konten = $this->renderTemplate($surat);
         $pdf->writeHTML($konten, true, false, true, false, '');
         $pdf->Output($outputPath, 'F');
+        error_reporting($oldErr);
     }
 
     /**
@@ -23,6 +27,9 @@ class PdfHelper {
      * QR ditempel SETELAH hash dihitung — tidak mempengaruhi hash
      */
     public function renderSuratDenganQr(array $surat, string $qrPath, string $outputPath): void {
+        // suppress deprecated notices from TCPDF during PDF rendering
+        $oldErr = error_reporting();
+        error_reporting($oldErr & ~E_DEPRECATED);
         $pdf = $this->createPdf($surat['perihal']);
         $konten = $this->renderTemplate($surat);
         $pdf->writeHTML($konten, true, false, true, false, '');
@@ -47,6 +54,7 @@ class PdfHelper {
         }
 
         $pdf->Output($outputPath, 'F');
+        error_reporting($oldErr);
     }
 
     private function createPdf(string $title): TCPDF {

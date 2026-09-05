@@ -13,8 +13,12 @@ class QrHelper {
      * @param string $outputPath Path output file PNG
      */
     public static function generate(string $url, string $outputPath): void {
+        // suppress deprecated notices originating from TCPDF internals during barcode generation
+        $oldErr = error_reporting();
+        error_reporting($oldErr & ~E_DEPRECATED);
         $barcode = new TCPDF2DBarcode($url, 'QRCODE,M');
         $svgData = $barcode->getBarcodeSVGcode(5, 5, 'black');
+        error_reporting($oldErr);
 
         if ($svgData === false || $svgData === '') {
             throw new Exception('Gagal generate QR Code untuk URL: ' . $url);
