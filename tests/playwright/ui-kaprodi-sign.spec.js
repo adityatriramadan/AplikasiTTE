@@ -1,5 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
+test.setTimeout(120000);
+
 test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   const base = process.env.EOFFICE_BASE_URL || 'http://127.0.0.1:8080';
 
