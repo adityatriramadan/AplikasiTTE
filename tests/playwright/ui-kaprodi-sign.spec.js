@@ -42,10 +42,12 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
     // success
     return;
   }
+  // Capture debug artifacts
+  try { await page.screenshot({ path: 'test-results/kaprodi_failure.png', fullPage: true }); } catch(e) {}
+  try { const html = await page.content(); require('fs').writeFileSync('test-results/kaprodi_failure.html', html); } catch(e) {}
   if (finalUrl.includes('?url=kaprodi/review/')) {
-    // Attempt to surface error message from page
     const err = await page.locator('.alert.error').innerText().catch(() => 'Unknown error - no .alert.error');
     throw new Error('Signing failed, redirected to review: ' + err + ' | URL=' + finalUrl);
   }
-  throw new Error('Signing did not complete; final URL=' + finalUrl);
+  throw new Error('Signing did not complete; final URL=' + finalUrl + ' (see test-results/kaprodi_failure.html and .png)');
 });
