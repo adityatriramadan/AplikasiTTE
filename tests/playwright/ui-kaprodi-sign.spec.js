@@ -7,18 +7,18 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   await page.goto(`${base}/?url=__test_login&nip=${process.env.EOFFICE_KAPRODI_USER || 'kaprodi001'}`);
   await page.waitForURL('**/?url=kaprodi/*');
 
-  // Go to antrian and open first review
-  await page.goto(`${base}/kaprodi/antrian`);
+  // Go to antrian and open first review (query-route)
+  await page.goto(`${base}/?url=kaprodi/antrian`);
   // Click first review link (selector may vary)
-  await page.click('a[href*="/kaprodi/review/"]');
+  await page.click('a[href*="?url=kaprodi/review/"]');
 
   // Click tombol tanda tangan / input pin
-  await page.click('a[href*="/kaprodi/input-pin/"]');
+  await page.click('a[href*="?url=kaprodi/input-pin/"]');
 
   // Fill PIN (test account must have known PIN)
   await page.fill('input[name="pin"]', process.env.EOFFICE_KAPRODI_PIN || '1234');
   await page.click('button[type="submit"]');
 
   // Expect success page or notification
-  await expect(page).toHaveURL(/.*kaprodi\/sukses\/.*/);
+  await expect(page).toHaveURL(/.*\?url=kaprodi\/sukses\/.*/);
 });
