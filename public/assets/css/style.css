@@ -1,0 +1,15 @@
+/* Asset stylesheet placeholder for the concept-aligned static layer. */
+
+body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+a {
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.btn:hover,
+.nav a:hover {
+    transform: translateY(-1px);
+}

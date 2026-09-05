@@ -1,0 +1,17 @@
+# Matikan fitur Directory Listing agar folder tidak bisa diintip
+Options -Indexes
+
+# Aktifkan rewrite engine untuk kebutuhan aplikasi Anda
+RewriteEngine On
+
+# Blokir akses langsung ke file sensitif
+<FilesMatch "\.(sql|log|md|env)$">
+	Require all denied
+</FilesMatch>
+
+# Blokir akses langsung ke storage kunci privat
+RewriteRule ^storage/keys/ - [F,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
