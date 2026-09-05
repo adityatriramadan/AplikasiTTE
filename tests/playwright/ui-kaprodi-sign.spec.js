@@ -30,6 +30,8 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   await expect(page.locator('input[name="pin"]')).toBeVisible({ timeout: 5000 });
   const pin = process.env.EOFFICE_KAPRODI_PIN || '1234';
   await page.fill('input[name="pin"]', pin);
+  // Accept the confirmation dialog triggered by onsubmit
+  page.once('dialog', dialog => dialog.accept());
   await page.click('button[type="submit"]');
   // Wait for either success or review redirect (allow longer timeout)
   await page.waitForTimeout(2000);
