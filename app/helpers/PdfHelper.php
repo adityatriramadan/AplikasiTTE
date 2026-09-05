@@ -25,7 +25,18 @@ class PdfHelper {
 
         // Tempel QR Code pojok kanan bawah
         if (file_exists($qrPath)) {
-            $pdf->Image($qrPath, 170, 265, 30, 30, 'PNG');
+            $ext = strtolower(pathinfo($qrPath, PATHINFO_EXTENSION));
+            if ($ext === 'svg') {
+                $svg = file_get_contents($qrPath);
+                if ($svg !== false && trim($svg) !== '') {
+                    // Use TCPDF ImageSVG to render embedded SVG
+                    $pdf->ImageSVG('@' . $svg, 170, 265, 30, 30);
+                }
+            } else {
+                // default: let TCPDF handle raster images (PNG/JPG)
+                $pdf->Image($qrPath, 170, 265, 30, 30, strtoupper($ext === 'jpg' ? 'JPG' : 'PNG'));
+            }
+
             $pdf->SetXY(155, 258);
             $pdf->SetFont('dejavusans', '', 6);
             $pdf->Cell(55, 5, 'Scan untuk verifikasi keaslian dokumen', 0, 0, 'C');
