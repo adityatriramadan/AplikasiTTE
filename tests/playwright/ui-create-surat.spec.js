@@ -3,6 +3,10 @@ const { test, expect } = require('@playwright/test');
 test('Sekretaris can create surat (skeleton)', async ({ page }) => {
   // Configure BASE_URL in env when running locally, e.g. export EOFFICE_BASE_URL=http://localhost/eoffice
   const base = process.env.EOFFICE_BASE_URL || 'http://127.0.0.1:8080';
+  const consoleLogs = [];
+  page.on('console', msg => {
+    try { consoleLogs.push(`${new Date().toISOString()} [${msg.type()}] ${msg.text()}`); } catch(e) {}
+  });
 
   // Quick-test login via test helper route (only enabled when EOFFICE_ENABLE_TEST_ROUTES=1)
   await page.goto(`${base}/?url=__test_login&nip=${process.env.EOFFICE_TEST_USER || 'sekretaris001'}`);
@@ -35,4 +39,5 @@ test('Sekretaris can create surat (skeleton)', async ({ page }) => {
 
   // 8) Expect preview page to load (Preview Surat heading)
   await expect(page.locator('text=Preview Surat')).toBeVisible({ timeout: 5000 });
+  try { require('fs').writeFileSync('test-results/sekretaris_console.log', consoleLogs.join('\n')); } catch(e) {}
 });

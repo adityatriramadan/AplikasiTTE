@@ -4,6 +4,10 @@ test.setTimeout(120000);
 
 test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   const base = process.env.EOFFICE_BASE_URL || 'http://127.0.0.1:8080';
+  const consoleLogs = [];
+  page.on('console', msg => {
+    try { consoleLogs.push(`${new Date().toISOString()} [${msg.type()}] ${msg.text()}`); } catch(e) {}
+  });
 
   // Quick-test login via test helper route
   await page.goto(`${base}/?url=__test_login&nip=${process.env.EOFFICE_KAPRODI_USER || 'kaprodi001'}`);
@@ -44,12 +48,14 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   await page.waitForTimeout(43000);
   const finalUrl = page.url();
   if (finalUrl.includes('?url=kaprodi/sukses/')) {
-    // success
+    // success — write console logs
+    try { require('fs').writeFileSync('test-results/kaprodi_console.log', consoleLogs.join('\n')); } catch(e) {}
     return;
   }
   // Capture debug artifacts
   try { await page.screenshot({ path: 'test-results/kaprodi_failure.png', fullPage: true }); } catch(e) {}
   try { const html = await page.content(); require('fs').writeFileSync('test-results/kaprodi_failure.html', html); } catch(e) {}
+  try { require('fs').writeFileSync('test-results/kaprodi_console.log', consoleLogs.join('\n')); } catch(e) {}
   if (finalUrl.includes('?url=kaprodi/review/')) {
     const err = await page.locator('.alert.error').innerText().catch(() => 'Unknown error - no .alert.error');
     throw new Error('Signing failed, redirected to review: ' + err + ' | URL=' + finalUrl);
