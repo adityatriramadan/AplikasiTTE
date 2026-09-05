@@ -115,3 +115,10 @@ jobs:
           EOFFICE_BASE_URL: http://127.0.0.1:8080
           EOFFICE_DISABLE_CSRF: '1'
         run: npx playwright test --reporter=list
+
+      - name: Upload Playwright test-results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: tests/playwright/test-results/**
