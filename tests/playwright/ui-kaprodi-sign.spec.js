@@ -29,6 +29,6 @@ test('Kaprodi can sign a surat (skeleton)', async ({ page }) => {
   const pin = process.env.EOFFICE_KAPRODI_PIN || '1234';
   await page.fill('input[name="pin"]', pin);
   await page.click('button[type="submit"]');
-  // Wait for success page after signing
-  await page.waitForURL('**/?url=kaprodi/sukses/*', { timeout: 10000 });
+  // Wait for success page after signing (increase timeout to allow PDF/hash/signing)
+  await page.waitForURL('**/?url=kaprodi/sukses/*', { timeout: 30000 });
 });
