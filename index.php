@@ -178,7 +178,13 @@ if ($seg0 === '' || $seg0 === 'login') {
 }
 
 // --- Test helper routes ---
+// Only enable test login when explicit test mode is active
 elseif ($seg0 === '__test_login') {
+    if (getenv('EOFFICE_TEST_MODE') !== '1') {
+        http_response_code(403);
+        echo 'Test routes disabled';
+        exit;
+    }
     // Usage: /?url=__test_login&nip=sekretaris001
     $nip = $_GET['nip'] ?? '';
     if (!empty($nip)) {
